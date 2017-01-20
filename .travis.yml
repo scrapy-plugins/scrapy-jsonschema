@@ -1,29 +1,23 @@
 language: python
 sudo: false
-
 matrix:
   include:
-    - python: 2.7
-      env: TOXENV=py27
-    - python: 3.5
-      env: TOXENV=py35
-    - python: 3.6
-      env: TOXENV=py36
-
+  - python: 2.7
+    env: TOXENV=py27
+  - python: 3.5
+    env: TOXENV=py35
+  - python: 3.6
+    env: TOXENV=py36
 install: pip install -U tox codecov
-
 script: tox
-
 after_success:
-  - codecov
-
-#deploy:
-  #provider: pypi
-  #distributions: "sdist bdist_wheel"
-  #user: redapple
-  #password:
-    #secure: ************
-  #on:
-    #tags: true
-    #repo: scrapy-plugins/scrapy-jsonschema
-    #condition: $TOXENV = py35
+- codecov
+deploy:
+  provider: pypi
+  distributions: sdist bdist_wheel
+  user: redapple
+  password:
+    secure: LG9SMlJ1kCgluYzIrbQYNmfYeOEbMHBabfqIjFXTnPurHnfyW4tQ0XfJlYZs5HGAZGyHxMHca6TDaJpXmUpiA/Trjhis1MSg9J7Rgvf9vEC95qv3KS4QfjVzUYGxPrL0xesfTlgwZtugqvBEYHssPuMieqOoQnCZCGRk2lyy/zKYhok3KaEFzqyS7un25cJviZkdW9tfQ0ECuX2LXW48LTbRttfSW2/pExrKPYcoErg6QWjksNODwdAz+oLELvi08vRdiaRI0nJ1AiWWr9mgPh4s650cCqL10WDzPGhrnhWeUBNjASP1aTUCZ366WR4mKc8AC3rQ/LuNcZZ0VCpjl44TLgzuYJTv6vfHKmpxzkR0opdWLTMsESxQ98h5aUgJGJ97+CCVbC96k/POUYPybhNo12QpBKo4RVD6IVlaH+jaKJsaAep+bYyrVeKdbMDHHksDHyR/FxX/7Bgw0rPSM3H1THq07V3CcRvxhTT5uxVSc/edghgYM8oIf9HhonRqC2S97iBBhOvi+esJop2Eb4KtHzvwucT0fKptc5/EhdgzEzpjY7uMt7dYGCU3O3KPV5EDxWBawnxzsy5+AxilRqrjHfpniHQDUg+3xDDEHvY/rVF9kzMzvN1I+BEpYE/UDpI9yb8v9ySMGyppkJcZVbX88AmucbiFdDNQ75MYR1c=
+  on:
+    tags: true
+    repo: scrapy-plugins/scrapy-jsonschema
