@@ -119,7 +119,7 @@ You can then use this item class as any regular Scrapy item
 
 If you use this item definition in a spider and if the pipeline is enabled,
 generated items that do no follow the schema will be dropped.
-In the (unrealistice) example spider below, one of the items only contains the "name",
+In the (unrealistic) example spider below, one of the items only contains the "name",
 and "id" and "price" are missing::
 
     class ExampleSpider(scrapy.Spider):
@@ -129,10 +129,17 @@ and "id" and "price" are missing::
 
         def parse(self, response):
             yield ProductItem({
-                "id": response.css('title::text').extract_first()
+                "name": response.css('title::text').extract_first()
             })
 
-When running this spider, you should see these lines appear in the logs::
+            yield ProductItem({
+                "id": 1,
+                "name": response.css('title::text').extract_first(),
+                "price": 9.99
+            })
+
+When running this spider, when the item with missing fields is output,
+you should see these lines appear in the logs::
 
     2017-01-20 12:34:23 [scrapy.core.scraper] WARNING: Dropped: schema validation failed:
      id: 'id' is a required property
@@ -140,13 +147,13 @@ When running this spider, you should see these lines appear in the logs::
 
     {'name': u'Example Domain'}
 
-The second item is valid so will appear as a regular item log::
+The second item conforms to the schema so it appears as a regular item log::
 
     2017-01-20 12:34:23 [scrapy.core.scraper] DEBUG: Scraped from <200 http://example.com/>
     {'id': 1, 'name': u'Example Domain', 'price': 9.99}
 
 
-The item pipeline also updates the stats with a few counters, under
+The item pipeline also updates Scrapy stats with a few counters, under
 ``jsonschema/`` namespace::
 
     2017-01-20 12:34:23 [scrapy.statscollectors] INFO: Dumping Scrapy stats:
