@@ -1,0 +1,29 @@
+language: python
+sudo: false
+
+matrix:
+  include:
+    - python: 2.7
+      env: TOXENV=py27
+    - python: 3.5
+      env: TOXENV=py35
+    - python: 3.6
+      env: TOXENV=py36
+
+install: pip install -U tox codecov
+
+script: tox
+
+after_success:
+  - codecov
+
+#deploy:
+  #provider: pypi
+  #distributions: "sdist bdist_wheel"
+  #user: redapple
+  #password:
+    #secure: ************
+  #on:
+    #tags: true
+    #repo: scrapy-plugins/scrapy-jsonschema
+    #condition: $TOXENV = py35
