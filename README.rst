@@ -9,13 +9,14 @@ scrapy-jsonschema
   :target: https://codecov.io/gh/scrapy-plugins/scrapy-jsonschema
 
 This plugin provides two features based on `JSON Schema`_ and the
-`jsonschema` Python library:
+`jsonschema`_ Python library:
 
 * a `Scrapy Item`_ definition builder from a JSON Schema definition
-* an item pipeline to validate items against a JSON Schema definition
+* a `Scrapy item pipeline`_ to validate items against a JSON Schema definition
 
 .. _jsonschema: https://pypi.python.org/pypi/jsonschema
 .. _Scrapy Item: https://docs.scrapy.org/en/latest/topics/items.html
+.. _Scrapy item pipeline: https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 
 
 Installation
