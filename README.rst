@@ -99,7 +99,7 @@ you can use Python's ``json`` module to load a JSON Schema as string)::
                 "price": {
                     "type": "number",
                     "minimum": 0,
-                    "exclusiveMinimum": true
+                    "exclusiveMinimum": True
                 }
             },
             "required": ["id", "name", "price"]
