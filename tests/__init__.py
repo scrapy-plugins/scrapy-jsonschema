@@ -35,6 +35,60 @@ invalid_schema = {
     "type": "invalid-type"
 }
 
+merge_schema_base = {
+    'required': ['bar'],
+    'properties': {
+        'bar': {
+            'type': 'string',
+        },
+    },
+}
+
+merge_schema_base_2 = {
+    'properties': {
+        'foo': {
+            'type': 'string',
+        },
+    }
+}
+
+merge_schema_new = {
+    'required': ['foo'],
+    'properties': {
+        'foo': {
+            'type': 'string',
+            'pattern': r'^\d+$',
+        },
+        'baz': {
+            'type': 'string',
+        },
+    },
+}
+
+merged_valid_docs = [
+    {
+        'foo': '123',
+        'bar': 'baz',
+        'baz': 'bar',
+    },
+]
+
+merged_invalid_docs = [
+    {
+        # valid for base
+        'bar': 'baz',
+    },
+    {
+        # valid for base 2
+        'foo': '123',
+    },
+    {
+        # valid for new
+        'foo': '123',
+        'baz': 'bar',
+    },
+]
+
 valid_docs = [
     {
         "id": 123,
