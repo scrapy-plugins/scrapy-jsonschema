@@ -11,13 +11,10 @@ def _merge_schema(base, new):
     if new is None:
         return base
     if all(isinstance(x, dict) for x in (base, new)):
-        ret = {}
-        for key in base:
-            ret[key] = _merge_schema(base[key], new.get(key))
-        for key in new:
-            if key not in base:
-                ret[key] = new[key]
-        return ret
+        return {
+            key: _merge_schema(base.get(key), new.get(key))
+            for key in six.viewkeys(base) | six.viewkeys(new)
+        }
     if all(isinstance(x, (list, tuple)) for x in (base, new)):
         return list(base) + list(new)
     return base
