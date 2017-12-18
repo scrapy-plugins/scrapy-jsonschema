@@ -31,6 +31,7 @@ class JsonSchemaMeta(ABCMeta):
                 base_schema = getattr(base, 'jsonschema', None)
                 if base_schema:
                     schema = _merge_schema(schema, base_schema)
+            setattr(cls, 'jsonschema', schema)
         if not schema:
             raise ValueError('{} must contain "jsonschema" attribute'
                              .format(cls.__name__))
