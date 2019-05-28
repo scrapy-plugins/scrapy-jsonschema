@@ -30,7 +30,7 @@ class JsonSchemaValidatePipeline(object):
             required_match = self.REQUIRED_RE.search(error.message)
             if required_match:
                 absolute_path.append(required_match.group(1))
-            path = '.'.join(absolute_path)
+            path = '.'.join(map(str, absolute_path))
             self.stats.inc_value(self.STAT_FMT.format(field=path))
             paths_messages.append((path, error.message))
         if errors:
