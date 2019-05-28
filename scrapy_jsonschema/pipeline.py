@@ -7,7 +7,7 @@ from scrapy_jsonschema import JsonSchemaItem
 
 class JsonSchemaValidatePipeline(object):
 
-    STAT_FMT = 'jsonschema/errors/{field}'
+    STAT_FMT = "jsonschema/errors/{field}"
     REQUIRED_RE = re.compile("'(.+?)' is a required property")
 
     @classmethod
@@ -30,14 +30,13 @@ class JsonSchemaValidatePipeline(object):
             required_match = self.REQUIRED_RE.search(error.message)
             if required_match:
                 absolute_path.append(required_match.group(1))
-            path = '.'.join(map(str, absolute_path))
+            path = ".".join(map(str, absolute_path))
             self.stats.inc_value(self.STAT_FMT.format(field=path))
             paths_messages.append((path, error.message))
         if errors:
-            error_msg = ''
+            error_msg = ""
             for path, message in paths_messages:
-                error_msg += u'{}: {}\n'.format(path, message)
-            raise DropItem(u'schema validation failed: \n {}'
-                           .format(error_msg))
+                error_msg += u"{}: {}\n".format(path, message)
+            raise DropItem(u"schema validation failed:\n{}".format(error_msg))
 
         return item
