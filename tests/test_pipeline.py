@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from scrapy.statscol import StatsCollector
+from scrapy.statscollectors import StatsCollector
 from scrapy.exceptions import DropItem
 from scrapy_jsonschema.pipeline import JsonSchemaValidatePipeline
 from scrapy_jsonschema.item import JsonSchemaItem
