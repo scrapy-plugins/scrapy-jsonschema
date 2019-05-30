@@ -1,8 +1,12 @@
+import pytest
 from unittest import TestCase
 
 from jsonschema.exceptions import SchemaError
+from jsonschema import Draft4Validator, Draft7Validator
 
 from scrapy_jsonschema.item import JsonSchemaItem, _merge_schema
+from scrapy_jsonschema.draft import JSON_SCHEMA_DRAFT_7
+
 from . import (
     valid_schema,
     invalid_schema,
@@ -25,16 +29,17 @@ class ValidSchemaTestCase(TestCase):
         "nested": {"list_to_merge": [3], "both": "bar", "only_new": "baz"},
     }
 
+    def test_no_schema(self):
+        with pytest.raises(ValueError):
+
+            class TestNoSchema(JsonSchemaItem):
+                jsonschema = None
+
     def test_invalid_schema(self):
-        try:
+        with pytest.raises(SchemaError):
 
             class TestItem1(JsonSchemaItem):
                 jsonschema = invalid_schema
-
-        except SchemaError:
-            pass
-        else:
-            self.fail("SchemaError was not raised")
 
     def test_valid_schema(self):
         class TestItem2(JsonSchemaItem):
@@ -67,3 +72,16 @@ class ValidSchemaTestCase(TestCase):
         class Merged(Base, Base2):
             jsonschema = merge_schema_new
             merge_schema = True
+
+    def test_get_validator(self):
+        schema = {
+            "$schema": JSON_SCHEMA_DRAFT_7,
+            "title": "Item with Schema Draft",
+        }
+
+        draft7_validator = JsonSchemaItem._get_validator(schema)
+        self.assertTrue(isinstance(draft7_validator, Draft7Validator))
+
+        no_draft_chema = {"title": "Item without schema Draft"}
+        default_validator = JsonSchemaItem._get_validator(no_draft_chema)
+        self.assertTrue(isinstance(default_validator, Draft4Validator))

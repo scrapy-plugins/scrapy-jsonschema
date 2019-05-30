@@ -1,4 +1,7 @@
+from scrapy_jsonschema.draft import JSON_SCHEMA_DRAFT_7
+
 valid_schema = {
+    "$schema": JSON_SCHEMA_DRAFT_7,
     "title": "Product",
     "description": "Some product's description",
     "type": "object",

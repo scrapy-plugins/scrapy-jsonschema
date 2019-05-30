@@ -1,12 +1,7 @@
 from abc import ABCMeta
 
 import six
-from jsonschema import (
-    Draft3Validator,
-    Draft4Validator,
-    Draft6Validator,
-    Draft7Validator,
-)
+from jsonschema import Draft3Validator, Draft4Validator, Draft6Validator, Draft7Validator
 from scrapy.item import DictItem, Field
 
 from scrapy_jsonschema.draft import (
@@ -15,13 +10,6 @@ from scrapy_jsonschema.draft import (
     JSON_SCHEMA_DRAFT_6,
     JSON_SCHEMA_DRAFT_7,
 )
-
-draft_to_validator = {
-    JSON_SCHEMA_DRAFT_3: Draft3Validator,
-    JSON_SCHEMA_DRAFT_4: Draft4Validator,
-    JSON_SCHEMA_DRAFT_6: Draft6Validator,
-    JSON_SCHEMA_DRAFT_7: Draft7Validator,
-}
 
 
 def _merge_schema(base, new):
@@ -38,6 +26,14 @@ def _merge_schema(base, new):
 
 
 class JsonSchemaMeta(ABCMeta):
+
+    draft_to_validator = {
+        JSON_SCHEMA_DRAFT_3: Draft3Validator,
+        JSON_SCHEMA_DRAFT_4: Draft4Validator,
+        JSON_SCHEMA_DRAFT_6: Draft6Validator,
+        JSON_SCHEMA_DRAFT_7: Draft7Validator,
+    }
+
     def __new__(mcs, class_name, bases, attrs):
         cls = super(JsonSchemaMeta, mcs).__new__(mcs, class_name, bases, attrs)
         fields = {}
@@ -53,16 +49,20 @@ class JsonSchemaMeta(ABCMeta):
             raise ValueError(
                 '{} must contain "jsonschema" attribute'.format(cls.__name__)
             )
-        draft_version = schema.get('$schema')
-        # Default to Draft4Validator for backward-compatibility
-        validator = draft_to_validator.get(draft_version, Draft4Validator)
-        cls.validator = validator(schema)
+        cls.validator = cls._get_validator(schema)
         cls.validator.check_schema(schema)
         for k in schema["properties"]:
             fields[k] = Field()
         cls.fields = cls.fields.copy()
         cls.fields.update(fields)
         return cls
+
+    @classmethod
+    def _get_validator(cls, schema):
+        draft_version = schema.get('$schema')
+        # Default to Draft4Validator for backward-compatibility
+        validator_class = cls.draft_to_validator.get(draft_version, Draft4Validator)
+        return validator_class(schema)
 
 
 @six.add_metaclass(JsonSchemaMeta)

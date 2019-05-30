@@ -1,5 +1,6 @@
 from unittest import TestCase
 
+from scrapy import Item
 from scrapy.statscollectors import StatsCollector
 from scrapy.exceptions import DropItem
 from scrapy_jsonschema.pipeline import JsonSchemaValidatePipeline
@@ -27,6 +28,13 @@ class TestItem(JsonSchemaItem):
 
 
 class JsonSchemaValidatePipelineTestCase(TestCase):
+    def test_default_item(self):
+        stats = self._get_stats_for_docs(valid_docs, True)
+        pipeline = JsonSchemaValidatePipeline(stats)
+        item = Item()
+        output_item = pipeline.process_item(item, None)
+        assert item == output_item
+
     def test_with_valid_items(self):
         stats = self._get_stats_for_docs(valid_docs, True)
         self.assertEqual(stats.get_stats(), {})
