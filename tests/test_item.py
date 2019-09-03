@@ -6,6 +6,7 @@ from jsonschema import Draft4Validator, Draft7Validator
 
 from scrapy_jsonschema.item import JsonSchemaItem, _merge_schema
 from scrapy_jsonschema.draft import JSON_SCHEMA_DRAFT_7
+from jsonschema.exceptions import ValidationError
 
 from . import (
     valid_schema,
@@ -85,3 +86,21 @@ class ValidSchemaTestCase(TestCase):
         no_draft_chema = {"title": "Item without schema Draft"}
         default_validator = JsonSchemaItem._get_validator(no_draft_chema)
         self.assertTrue(isinstance(default_validator, Draft4Validator))
+
+    def test_format_validation(self):
+        schema = {
+            "$schema": JSON_SCHEMA_DRAFT_7,
+            "title": "Item with Schema Draft",
+            "properties": {
+                "url": {
+                    "type": "string",
+                    "format": "uri"
+                }
+            }
+        }
+
+        with pytest.raises(ValidationError):
+            draft7_validator = JsonSchemaItem._get_validator(schema)
+            draft7_validator.validate({'url': 'this is not an uri'})
+
+        draft7_validator.validate({'url': 'http://localhost'})

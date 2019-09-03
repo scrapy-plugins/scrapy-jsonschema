@@ -6,8 +6,8 @@ from jsonschema import (
     Draft4Validator,
     Draft6Validator,
     Draft7Validator,
+    FormatChecker
 )
-
 from scrapy_jsonschema.draft import (
     JSON_SCHEMA_DRAFT_3,
     JSON_SCHEMA_DRAFT_4,
@@ -33,6 +33,8 @@ def _merge_schema(base, new):
 
 
 class JsonSchemaMeta(ABCMeta):
+
+    format_checker = FormatChecker()
 
     draft_to_validator = {
         JSON_SCHEMA_DRAFT_3: Draft3Validator,
@@ -71,7 +73,7 @@ class JsonSchemaMeta(ABCMeta):
         validator_class = cls.draft_to_validator.get(
             draft_version, Draft4Validator
         )
-        return validator_class(schema)
+        return validator_class(schema, format_checker=cls.format_checker)
 
 
 @six.add_metaclass(JsonSchemaMeta)
