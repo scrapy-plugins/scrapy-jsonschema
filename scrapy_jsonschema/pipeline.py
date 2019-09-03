@@ -37,7 +37,6 @@ class JsonSchemaValidatePipeline(object):
             error_msg = ''
             for path, message in paths_messages:
                 error_msg += u'{}: {}\n'.format(path, message)
-            raise DropItem(u'schema validation failed: \n {}'
-                           .format(error_msg))
+            raise DropItem(u'schema validation failed: \n {}'.format(error_msg))
 
         return item
