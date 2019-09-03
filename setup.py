@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='scrapy-jsonschema',
-    version='0.2.4',
+    version='0.2.5',
     license='BSD',
     description='Scrapy schema validation pipeline and Item builder using JSON Schema',
     author='Scrapinghub',
