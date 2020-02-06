@@ -7,7 +7,7 @@ from jsonschema import (
     Draft4Validator,
     Draft6Validator,
     Draft7Validator,
-    FormatChecker,
+    FormatChecker
 )
 from scrapy_jsonschema.draft import (
     JSON_SCHEMA_DRAFT_3,
@@ -63,42 +63,42 @@ class JsonSchemaMeta(ABCMeta):
         cls = super(JsonSchemaMeta, mcs).__new__(mcs, class_name, bases, attrs)
 
         fields = {}
-        schema = attrs.get("jsonschema", {})
+        schema = attrs.get('jsonschema', {})
         if cls.merge_schema:
             # priority: left to right
             for base in bases:
-                base_schema = getattr(base, "jsonschema", None)
+                base_schema = getattr(base, 'jsonschema', None)
                 if base_schema:
                     schema = _merge_schema(schema, base_schema)
-            setattr(cls, "jsonschema", schema)
+            setattr(cls, 'jsonschema', schema)
         if not schema:
             raise ValueError(
                 '{} must contain "jsonschema" attribute'.format(cls.__name__)
             )
         cls.validator = cls._get_validator(schema)
         cls.validator.check_schema(schema)
-        for k in schema["properties"]:
+        for k in schema['properties']:
             fields[k] = Field()
         cls.fields = cls.fields.copy()
         cls.fields.update(fields)
 
-        pattern_properties = schema.get("patternProperties", {})
+        pattern_properties = schema.get('patternProperties', {})
         cls.pattern_properties = [
             re.compile(p)
             for p in pattern_properties.keys()
-            if p is not "additionalProperties"
+            if p is not 'additionalProperties'
         ]
         return cls
 
     @classmethod
     def _get_validator(cls, schema):
-        draft_version = schema.get("$schema")
+        draft_version = schema.get('$schema')
         # Default to Draft4Validator for backward-compatibility
         validator_class = cls.draft_to_validator.get(
             draft_version, Draft4Validator
         )
         format_checker = cls.draft_to_format_checker.get(
-            schema.get("$schema"), draft4_format_checker
+            schema.get('$schema'), draft4_format_checker
         )
         return validator_class(schema, format_checker=format_checker)
 
