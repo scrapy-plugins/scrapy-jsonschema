@@ -104,3 +104,33 @@ class ValidSchemaTestCase(TestCase):
             draft7_validator.validate({'url': 'this is not an uri'})
 
         draft7_validator.validate({'url': 'http://localhost'})
+
+    def test_pattern_properties(self):
+        schema = {
+            "$schema": JSON_SCHEMA_DRAFT_7,
+            "title": "Item with Schema Draft",
+            "properties": {
+                "title": {
+                    "type": "string",
+                },
+            },
+            "additionalProperties": False,
+            "patternProperties": {
+                r"image_\d+": {"type": "string"},
+                "additionalProperties": False,
+            },
+        }
+
+        draft7_validator = JsonSchemaItem._get_validator(schema)
+        draft7_validator.validate({'image_1': 'http://foo.com/bar/1'})
+        with pytest.raises(ValidationError):
+            draft7_validator.validate({'image_a': 'http://foo.com/bar/a'})
+
+        class PatternPropertiesItem(JsonSchemaItem):
+            jsonschema = schema
+
+        item = PatternPropertiesItem()
+        item['image_1'] = 'http://foo.com/bar/1'
+
+        with pytest.raises(KeyError):
+            item['image_a'] = 'http://foo.com/bar/a'
