@@ -22,5 +22,5 @@ setup(
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
     ],
-    install_requires=['scrapy', 'jsonschema', 'six']
+    install_requires=['scrapy', 'jsonschema[format]', 'six']
 )

@@ -1,5 +1,6 @@
 from abc import ABCMeta
 
+import re
 import six
 from jsonschema import (
     Draft3Validator,
@@ -13,6 +14,13 @@ from scrapy_jsonschema.draft import (
     JSON_SCHEMA_DRAFT_4,
     JSON_SCHEMA_DRAFT_6,
     JSON_SCHEMA_DRAFT_7,
+)
+
+from jsonschema import (
+    draft3_format_checker,
+    draft4_format_checker,
+    draft6_format_checker,
+    draft7_format_checker,
 )
 
 from scrapy.item import Item, Field
@@ -34,6 +42,7 @@ def _merge_schema(base, new):
 
 class JsonSchemaMeta(ABCMeta):
 
+    # For backward compatibility
     format_checker = FormatChecker()
 
     draft_to_validator = {
@@ -41,6 +50,13 @@ class JsonSchemaMeta(ABCMeta):
         JSON_SCHEMA_DRAFT_4: Draft4Validator,
         JSON_SCHEMA_DRAFT_6: Draft6Validator,
         JSON_SCHEMA_DRAFT_7: Draft7Validator,
+    }
+
+    draft_to_format_checker = {
+        JSON_SCHEMA_DRAFT_3: draft3_format_checker,
+        JSON_SCHEMA_DRAFT_4: draft4_format_checker,
+        JSON_SCHEMA_DRAFT_6: draft6_format_checker,
+        JSON_SCHEMA_DRAFT_7: draft7_format_checker,
     }
 
     combination_schemas_keywords = ['allOf', 'anyOf', 'oneOf']
@@ -66,6 +82,13 @@ class JsonSchemaMeta(ABCMeta):
             fields[k] = Field()
         cls.fields = cls.fields.copy()
         cls.fields.update(fields)
+
+        pattern_properties = schema.get('patternProperties', {})
+        cls.pattern_properties = [
+            re.compile(p)
+            for p in pattern_properties.keys()
+            if p is not 'additionalProperties'
+        ]
         return cls
 
     @classmethod
@@ -85,10 +108,26 @@ class JsonSchemaMeta(ABCMeta):
         validator_class = cls.draft_to_validator.get(
             draft_version, Draft4Validator
         )
-        return validator_class(schema, format_checker=cls.format_checker)
+        format_checker = cls.draft_to_format_checker.get(
+            schema.get('$schema'), draft4_format_checker
+        )
+        return validator_class(schema, format_checker=format_checker)
 
 
 @six.add_metaclass(JsonSchemaMeta)
 class JsonSchemaItem(Item):
     jsonschema = {"properties": {}}
     merge_schema = False  # Off for backward-compatibility
+
+    def __setitem__(self, key, value):
+        if key in self.fields:
+            self._values[key] = value
+        elif any(x.match(key) for x in self.pattern_properties):
+            self.fields[key] = Field()
+            self._values[key] = value
+
+        else:
+            raise KeyError(
+                "%s does not support field: %s"
+                % (self.__class__.__name__, key)
+            )
