@@ -15,7 +15,7 @@ from scrapy_jsonschema.draft import (
     JSON_SCHEMA_DRAFT_7,
 )
 
-from scrapy.item import DictItem, Field
+from scrapy.item import Item, Field
 
 
 def _merge_schema(base, new):
@@ -43,6 +43,8 @@ class JsonSchemaMeta(ABCMeta):
         JSON_SCHEMA_DRAFT_7: Draft7Validator,
     }
 
+    combination_schemas_keywords = ['allOf', 'anyOf', 'oneOf']
+
     def __new__(mcs, class_name, bases, attrs):
         cls = super(JsonSchemaMeta, mcs).__new__(mcs, class_name, bases, attrs)
         fields = {}
@@ -60,11 +62,21 @@ class JsonSchemaMeta(ABCMeta):
             )
         cls.validator = cls._get_validator(schema)
         cls.validator.check_schema(schema)
-        for k in schema['properties']:
+        for k in cls.get_top_level_property_names(schema):
             fields[k] = Field()
         cls.fields = cls.fields.copy()
         cls.fields.update(fields)
         return cls
+
+    @classmethod
+    def get_top_level_property_names(cls, schema):
+        for field in schema.get('properties', {}):
+            yield field
+
+        for keyword in cls.combination_schemas_keywords:
+            for subschema in schema.get(keyword, []):
+                for field in subschema.get('properties', {}):
+                    yield field
 
     @classmethod
     def _get_validator(cls, schema):
@@ -77,6 +89,6 @@ class JsonSchemaMeta(ABCMeta):
 
 
 @six.add_metaclass(JsonSchemaMeta)
-class JsonSchemaItem(DictItem):
+class JsonSchemaItem(Item):
     jsonschema = {"properties": {}}
     merge_schema = False  # Off for backward-compatibility

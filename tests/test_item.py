@@ -16,6 +16,102 @@ from . import (
     merge_schema_new,
 )
 
+class SchemaWithCombiningKeywords(TestCase):
+
+    schema_allOf = {
+      "$schema": JSON_SCHEMA_DRAFT_7,
+        "allOf": [
+            {
+                "properties": {"foo": {"type": "string"}},
+                "required": ["foo"],
+            },
+            {
+                "properties": {"bar": {"type": "number"}},
+                "required": ["bar"]
+            }
+        ]
+    }
+
+    schema_anyOf = {
+      "$schema": JSON_SCHEMA_DRAFT_7,
+        "anyOf": [
+            {
+                "properties": {"foo": {"type": "string"}},
+                "required": ["foo"],
+            },
+            {
+                "properties": {"bar": {"type": "number"}},
+                "required": ["bar"]
+            }
+        ]
+    }
+
+    schema_oneOf = {
+      "$schema": JSON_SCHEMA_DRAFT_7,
+        "oneOf": [
+            {
+                "properties": {"foo": {"type": "string"}},
+                "required": ["foo"],
+            },
+            {
+                "properties": {"bar": {"type": "number"}},
+                "required": ["bar"]
+            }
+        ]
+    }
+
+    def test_all_of_schema(self):
+
+        class allOfItem(JsonSchemaItem):
+            jsonschema = self.schema_allOf
+
+        item = allOfItem()
+        item['foo'] = 'foo'
+        item['bar'] = 2
+        self.assertFalse(list(item.validator.iter_errors(dict(item))))
+
+        with pytest.raises(AssertionError):
+            item = allOfItem()
+            item['foo'] = 'foo'
+            self.assertFalse(list(item.validator.iter_errors(dict(item))))
+
+
+    def test_any_of_schema(self):
+
+        class anyOfItem(JsonSchemaItem):
+            jsonschema = self.schema_anyOf
+
+        item = anyOfItem()
+        item['foo'] = 'foo'
+        item['bar'] = 2
+        self.assertFalse(list(item.validator.iter_errors(dict(item))))
+
+        item = anyOfItem()
+        item['foo'] = 'foo'
+        self.assertFalse(list(item.validator.iter_errors(dict(item))))
+
+        item = anyOfItem()
+        item['bar'] = 2
+        self.assertFalse(list(item.validator.iter_errors(dict(item))))
+
+    def test_one_of_schema(self):
+
+        class oneOfItem(JsonSchemaItem):
+            jsonschema = self.schema_oneOf
+
+        item = oneOfItem()
+        item['foo'] = 'foo'
+        self.assertFalse(list(item.validator.iter_errors(dict(item))))
+
+        item = oneOfItem()
+        item['bar'] = 2
+        self.assertFalse(list(item.validator.iter_errors(dict(item))))
+
+        with pytest.raises(AssertionError):
+            item = oneOfItem()
+            item['foo'] = 'foo'
+            item['bar'] = 2
+            self.assertFalse(list(item.validator.iter_errors(dict(item))))
 
 class ValidSchemaTestCase(TestCase):
 
