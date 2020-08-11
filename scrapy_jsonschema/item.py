@@ -23,7 +23,7 @@ from jsonschema import (
     draft7_format_checker,
 )
 
-from scrapy.item import DictItem, Field
+from scrapy.item import DictItem, Field, _BaseItemMeta
 
 
 def _merge_schema(base, new):
@@ -40,7 +40,7 @@ def _merge_schema(base, new):
     return base
 
 
-class JsonSchemaMeta(ABCMeta):
+class JsonSchemaMeta(_BaseItemMeta):
 
     # For backward compatibility
     format_checker = FormatChecker()
