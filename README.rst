@@ -2,6 +2,12 @@
 scrapy-jsonschema
 =================
 
+.. image:: https://img.shields.io/pypi/pyversions/scrapy-jsonschema.svg
+       :target: https://pypi.python.org/pypi/scrapy-jsonschema
+
+.. image:: https://img.shields.io/pypi/v/scrapy-jsonschema.svg
+    :target: https://pypi.python.org/pypi/scrapy-jsonschema
+
 .. image:: https://travis-ci.org/scrapy-plugins/scrapy-jsonschema.svg?branch=master
     :target: https://travis-ci.org/scrapy-plugins/scrapy-jsonschema
 
