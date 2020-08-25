@@ -22,7 +22,7 @@ class ValidSchemaTestCase(TestCase):
         except SchemaError:
             pass
         else:
-            self.fail('SchemaError was not raised')
+            self.fail("SchemaError was not raised")
 
     def test_valid_schema(self):
         class TestItem2(JsonSchemaItem):
@@ -30,23 +30,23 @@ class ValidSchemaTestCase(TestCase):
 
     def test_merge_schema_func(self):
         schema1 = {
-            'both': 1,
-            'only_base': 2,
-            'nested': {'list_to_merge': [1, 2], 'both': 'foo'},
+            "both": 1,
+            "only_base": 2,
+            "nested": {"list_to_merge": [1, 2], "both": "foo"},
         }
         schema2 = {
-            'both': 3,
-            'only_new': 4,
-            'nested': {'list_to_merge': [3], 'both': 'bar', 'only_new': 'baz'},
+            "both": 3,
+            "only_new": 4,
+            "nested": {"list_to_merge": [3], "both": "bar", "only_new": "baz"},
         }
         expected = {
-            'both': 1,
-            'only_base': 2,
-            'only_new': 4,
-            'nested': {
-                'list_to_merge': [1, 2, 3],
-                'both': 'foo',
-                'only_new': 'baz',
+            "both": 1,
+            "only_base": 2,
+            "only_new": 4,
+            "nested": {
+                "list_to_merge": [1, 2, 3],
+                "both": "foo",
+                "only_new": "baz",
             },
         }
         self.assertEqual(_merge_schema(schema1, schema2), expected)

@@ -16,102 +16,91 @@ from . import (
     merge_schema_new,
 )
 
+
 class SchemaWithCombiningKeywords(TestCase):
 
     schema_allOf = {
-      "$schema": JSON_SCHEMA_DRAFT_7,
+        "$schema": JSON_SCHEMA_DRAFT_7,
         "allOf": [
             {
                 "properties": {"foo": {"type": "string"}},
                 "required": ["foo"],
             },
-            {
-                "properties": {"bar": {"type": "number"}},
-                "required": ["bar"]
-            }
-        ]
+            {"properties": {"bar": {"type": "number"}}, "required": ["bar"]},
+        ],
     }
 
     schema_anyOf = {
-      "$schema": JSON_SCHEMA_DRAFT_7,
+        "$schema": JSON_SCHEMA_DRAFT_7,
         "anyOf": [
             {
                 "properties": {"foo": {"type": "string"}},
                 "required": ["foo"],
             },
-            {
-                "properties": {"bar": {"type": "number"}},
-                "required": ["bar"]
-            }
-        ]
+            {"properties": {"bar": {"type": "number"}}, "required": ["bar"]},
+        ],
     }
 
     schema_oneOf = {
-      "$schema": JSON_SCHEMA_DRAFT_7,
+        "$schema": JSON_SCHEMA_DRAFT_7,
         "oneOf": [
             {
                 "properties": {"foo": {"type": "string"}},
                 "required": ["foo"],
             },
-            {
-                "properties": {"bar": {"type": "number"}},
-                "required": ["bar"]
-            }
-        ]
+            {"properties": {"bar": {"type": "number"}}, "required": ["bar"]},
+        ],
     }
 
     def test_all_of_schema(self):
-
         class allOfItem(JsonSchemaItem):
             jsonschema = self.schema_allOf
 
         item = allOfItem()
-        item['foo'] = 'foo'
-        item['bar'] = 2
+        item["foo"] = "foo"
+        item["bar"] = 2
         self.assertFalse(list(item.validator.iter_errors(dict(item))))
 
         with pytest.raises(AssertionError):
             item = allOfItem()
-            item['foo'] = 'foo'
+            item["foo"] = "foo"
             self.assertFalse(list(item.validator.iter_errors(dict(item))))
 
-
     def test_any_of_schema(self):
-
         class anyOfItem(JsonSchemaItem):
             jsonschema = self.schema_anyOf
 
         item = anyOfItem()
-        item['foo'] = 'foo'
-        item['bar'] = 2
+        item["foo"] = "foo"
+        item["bar"] = 2
         self.assertFalse(list(item.validator.iter_errors(dict(item))))
 
         item = anyOfItem()
-        item['foo'] = 'foo'
+        item["foo"] = "foo"
         self.assertFalse(list(item.validator.iter_errors(dict(item))))
 
         item = anyOfItem()
-        item['bar'] = 2
+        item["bar"] = 2
         self.assertFalse(list(item.validator.iter_errors(dict(item))))
 
     def test_one_of_schema(self):
-
         class oneOfItem(JsonSchemaItem):
             jsonschema = self.schema_oneOf
 
         item = oneOfItem()
-        item['foo'] = 'foo'
+        item["foo"] = "foo"
         self.assertFalse(list(item.validator.iter_errors(dict(item))))
 
         item = oneOfItem()
-        item['bar'] = 2
+        item["bar"] = 2
         self.assertFalse(list(item.validator.iter_errors(dict(item))))
 
         with pytest.raises(AssertionError):
             item = oneOfItem()
-            item['foo'] = 'foo'
-            item['bar'] = 2
+            item["foo"] = "foo"
+            item["bar"] = 2
             self.assertFalse(list(item.validator.iter_errors(dict(item))))
+
 
 class ValidSchemaTestCase(TestCase):
 
@@ -187,19 +176,14 @@ class ValidSchemaTestCase(TestCase):
         schema = {
             "$schema": JSON_SCHEMA_DRAFT_7,
             "title": "Item with Schema Draft",
-            "properties": {
-                "url": {
-                    "type": "string",
-                    "format": "uri"
-                }
-            }
+            "properties": {"url": {"type": "string", "format": "uri"}},
         }
 
         with pytest.raises(ValidationError):
             draft7_validator = JsonSchemaItem._get_validator(schema)
-            draft7_validator.validate({'url': 'this is not an uri'})
+            draft7_validator.validate({"url": "this is not an uri"})
 
-        draft7_validator.validate({'url': 'http://localhost'})
+        draft7_validator.validate({"url": "http://localhost"})
 
     def test_pattern_properties(self):
         schema = {
@@ -218,15 +202,15 @@ class ValidSchemaTestCase(TestCase):
         }
 
         draft7_validator = JsonSchemaItem._get_validator(schema)
-        draft7_validator.validate({'image_1': 'http://foo.com/bar/1'})
+        draft7_validator.validate({"image_1": "http://foo.com/bar/1"})
         with pytest.raises(ValidationError):
-            draft7_validator.validate({'image_a': 'http://foo.com/bar/a'})
+            draft7_validator.validate({"image_a": "http://foo.com/bar/a"})
 
         class PatternPropertiesItem(JsonSchemaItem):
             jsonschema = schema
 
         item = PatternPropertiesItem()
-        item['image_1'] = 'http://foo.com/bar/1'
+        item["image_1"] = "http://foo.com/bar/1"
 
         with pytest.raises(KeyError):
-            item['image_a'] = 'http://foo.com/bar/a'
+            item["image_a"] = "http://foo.com/bar/a"

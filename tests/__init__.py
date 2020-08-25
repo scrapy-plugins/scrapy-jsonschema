@@ -79,9 +79,7 @@ invalid_doc_types = [
     },
     {
         "id": 123,
-        "name": [
-            "name"
-        ],  # this value should be a string, not a list of strings
+        "name": ["name"],  # this value should be a string, not a list of strings
     },
 ]
 

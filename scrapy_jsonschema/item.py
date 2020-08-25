@@ -1,4 +1,3 @@
-
 import re
 import six
 from jsonschema import (
@@ -6,7 +5,7 @@ from jsonschema import (
     Draft4Validator,
     Draft6Validator,
     Draft7Validator,
-    FormatChecker
+    FormatChecker,
 )
 from scrapy_jsonschema.draft import (
     JSON_SCHEMA_DRAFT_3,
@@ -30,7 +29,6 @@ try:
 except ImportError:
     # Scrapy < 2.1
     from abc import ABCMeta as _BaseItemMeta
-
 
 
 def _merge_schema(base, new):
@@ -66,19 +64,19 @@ class JsonSchemaMeta(_BaseItemMeta):
         JSON_SCHEMA_DRAFT_7: draft7_format_checker,
     }
 
-    combination_schemas_keywords = ['allOf', 'anyOf', 'oneOf']
+    combination_schemas_keywords = ["allOf", "anyOf", "oneOf"]
 
     def __new__(mcs, class_name, bases, attrs):
         cls = super(JsonSchemaMeta, mcs).__new__(mcs, class_name, bases, attrs)
         fields = {}
-        schema = attrs.get('jsonschema', {})
+        schema = attrs.get("jsonschema", {})
         if cls.merge_schema:
             # priority: left to right
             for base in bases:
-                base_schema = getattr(base, 'jsonschema', None)
+                base_schema = getattr(base, "jsonschema", None)
                 if base_schema:
                     schema = _merge_schema(schema, base_schema)
-            setattr(cls, 'jsonschema', schema)
+            setattr(cls, "jsonschema", schema)
         if not schema:
             raise ValueError(
                 '{} must contain "jsonschema" attribute'.format(cls.__name__)
@@ -90,33 +88,31 @@ class JsonSchemaMeta(_BaseItemMeta):
         cls.fields = cls.fields.copy()
         cls.fields.update(fields)
 
-        pattern_properties = schema.get('patternProperties', {})
+        pattern_properties = schema.get("patternProperties", {})
         cls.pattern_properties = [
             re.compile(p)
             for p in pattern_properties.keys()
-            if p is not 'additionalProperties'
+            if p is not "additionalProperties"
         ]
         return cls
 
     @classmethod
     def get_top_level_property_names(cls, schema):
-        for field in schema.get('properties', {}):
+        for field in schema.get("properties", {}):
             yield field
 
         for keyword in cls.combination_schemas_keywords:
             for subschema in schema.get(keyword, []):
-                for field in subschema.get('properties', {}):
+                for field in subschema.get("properties", {}):
                     yield field
 
     @classmethod
     def _get_validator(cls, schema):
-        draft_version = schema.get('$schema')
+        draft_version = schema.get("$schema")
         # Default to Draft4Validator for backward-compatibility
-        validator_class = cls.draft_to_validator.get(
-            draft_version, Draft4Validator
-        )
+        validator_class = cls.draft_to_validator.get(draft_version, Draft4Validator)
         format_checker = cls.draft_to_format_checker.get(
-            schema.get('$schema'), draft4_format_checker
+            schema.get("$schema"), draft4_format_checker
         )
         return validator_class(schema, format_checker=format_checker)
 
@@ -135,6 +131,5 @@ class JsonSchemaItem(DictItem):
 
         else:
             raise KeyError(
-                "%s does not support field: %s"
-                % (self.__class__.__name__, key)
+                "%s does not support field: %s" % (self.__class__.__name__, key)
             )
