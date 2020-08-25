@@ -21,7 +21,7 @@ from jsonschema import (
     draft7_format_checker,
 )
 
-from scrapy.item import DictItem, Field, _BaseItemMeta
+from scrapy.item import DictItem, Field
 
 try:
     # Scrapy >=  2.1
