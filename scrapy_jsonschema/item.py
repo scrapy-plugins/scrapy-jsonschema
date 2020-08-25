@@ -1,4 +1,3 @@
-from abc import ABCMeta
 
 import re
 import six
@@ -24,6 +23,14 @@ from jsonschema import (
 )
 
 from scrapy.item import DictItem, Field, _BaseItemMeta
+
+try:
+    # Scrapy >=  2.1
+    from scrapy.item import _BaseItemMeta
+except ImportError:
+    # Scrapy < 2.1
+    from abc import ABCMeta as _BaseItemMeta
+
 
 
 def _merge_schema(base, new):
