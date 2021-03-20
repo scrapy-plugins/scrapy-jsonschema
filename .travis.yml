@@ -1,5 +1,6 @@
 language: python
 sudo: false
+dist: focal
 matrix:
   include:
   - python: 3.5
