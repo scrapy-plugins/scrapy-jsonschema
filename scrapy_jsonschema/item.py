@@ -110,8 +110,7 @@ class JsonSchemaMeta(ItemMeta):
         return validator_class(schema, format_checker=format_checker)
 
 
-@six.add_metaclass(JsonSchemaMeta)
-class JsonSchemaItem(Item):
+class JsonSchemaItem(Item, metaclass=JsonSchemaMeta):
     jsonschema = {"properties": {}}
     merge_schema = False  # Off for backward-compatibility
 
