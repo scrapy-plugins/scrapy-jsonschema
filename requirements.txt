@@ -1,3 +1,2 @@
 jsonschema[format]
 scrapy
-six
