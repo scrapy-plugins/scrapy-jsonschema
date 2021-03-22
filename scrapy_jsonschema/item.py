@@ -1,12 +1,18 @@
 import re
-import six
+
 from jsonschema import (
+    draft3_format_checker,
     Draft3Validator,
+    draft4_format_checker,
     Draft4Validator,
+    draft6_format_checker,
     Draft6Validator,
+    draft7_format_checker,
     Draft7Validator,
     FormatChecker,
 )
+from scrapy.item import DictItem, Field
+
 from scrapy_jsonschema.draft import (
     JSON_SCHEMA_DRAFT_3,
     JSON_SCHEMA_DRAFT_4,
@@ -14,14 +20,6 @@ from scrapy_jsonschema.draft import (
     JSON_SCHEMA_DRAFT_7,
 )
 
-from jsonschema import (
-    draft3_format_checker,
-    draft4_format_checker,
-    draft6_format_checker,
-    draft7_format_checker,
-)
-
-from scrapy.item import DictItem, Field
 
 try:
     # Scrapy >=  2.1
@@ -38,7 +36,7 @@ def _merge_schema(base, new):
     if all(isinstance(x, dict) for x in (base, new)):
         return {
             key: _merge_schema(base.get(key), new.get(key))
-            for key in six.viewkeys(base) | six.viewkeys(new)
+            for key in base.keys() | new.keys()
         }
     if all(isinstance(x, (list, tuple)) for x in (base, new)):
         return list(base) + list(new)
@@ -117,8 +115,7 @@ class JsonSchemaMeta(_BaseItemMeta):
         return validator_class(schema, format_checker=format_checker)
 
 
-@six.add_metaclass(JsonSchemaMeta)
-class JsonSchemaItem(DictItem):
+class JsonSchemaItem(DictItem, metaclass=JsonSchemaMeta):
     jsonschema = {"properties": {}}
     merge_schema = False  # Off for backward-compatibility
 
