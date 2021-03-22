@@ -92,7 +92,7 @@ class JsonSchemaMeta(_BaseItemMeta):
         cls.pattern_properties = [
             re.compile(p)
             for p in pattern_properties.keys()
-            if p is not "additionalProperties"
+            if p != "additionalProperties"
         ]
         return cls
 
