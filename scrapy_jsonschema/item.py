@@ -1,15 +1,15 @@
 import re
 
 from jsonschema import (
+    draft3_format_checker,
     Draft3Validator,
+    draft4_format_checker,
     Draft4Validator,
+    draft6_format_checker,
     Draft6Validator,
+    draft7_format_checker,
     Draft7Validator,
     FormatChecker,
-    draft3_format_checker,
-    draft4_format_checker,
-    draft6_format_checker,
-    draft7_format_checker,
 )
 from scrapy.item import DictItem, Field
 
