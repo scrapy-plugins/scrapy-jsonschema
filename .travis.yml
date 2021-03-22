@@ -1,6 +1,6 @@
 language: python
 sudo: false
-dist: xenial
+dist: focal
 matrix:
   include:
   - python: 3.5
