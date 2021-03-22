@@ -1,27 +1,24 @@
 import re
-import six
+
 from jsonschema import (
+    draft3_format_checker,
     Draft3Validator,
+    draft4_format_checker,
     Draft4Validator,
+    draft6_format_checker,
     Draft6Validator,
+    draft7_format_checker,
     Draft7Validator,
     FormatChecker,
 )
+from scrapy.item import Field, Item, ItemMeta
+
 from scrapy_jsonschema.draft import (
     JSON_SCHEMA_DRAFT_3,
     JSON_SCHEMA_DRAFT_4,
     JSON_SCHEMA_DRAFT_6,
     JSON_SCHEMA_DRAFT_7,
 )
-
-from jsonschema import (
-    draft3_format_checker,
-    draft4_format_checker,
-    draft6_format_checker,
-    draft7_format_checker,
-)
-
-from scrapy.item import Field, Item, ItemMeta
 
 
 def _merge_schema(base, new):
@@ -31,7 +28,7 @@ def _merge_schema(base, new):
     if all(isinstance(x, dict) for x in (base, new)):
         return {
             key: _merge_schema(base.get(key), new.get(key))
-            for key in six.viewkeys(base) | six.viewkeys(new)
+            for key in base.keys() | new.keys()
         }
     if all(isinstance(x, (list, tuple)) for x in (base, new)):
         return list(base) + list(new)
@@ -85,7 +82,7 @@ class JsonSchemaMeta(ItemMeta):
         cls.pattern_properties = [
             re.compile(p)
             for p in pattern_properties.keys()
-            if p is not "additionalProperties"
+            if p != "additionalProperties"
         ]
         return cls
 

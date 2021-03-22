@@ -5,8 +5,8 @@ setup(
     version="0.4.2",
     license="BSD",
     description="Scrapy schema validation pipeline and Item builder using JSON Schema",
-    author="Scrapinghub",
-    author_email="info@scrapinghub.com",
+    author="Zyte",
+    author_email="opensource@zyte.com",
     url="http://github.com/scrapy-plugins/scrapy-jsonschema",
     packages=["scrapy_jsonschema"],
     platforms=["Any"],
@@ -21,5 +21,5 @@ setup(
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
     ],
-    install_requires=["scrapy", "jsonschema[format]", "six"],
+    install_requires=["scrapy", "jsonschema[format]"],
 )
